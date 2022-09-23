@@ -8,7 +8,7 @@ import InProgressMinting from "./components/InProgressMinting";
 import CompletedMinting from "./components/CompletedMinting";
 
 function App() {
-  const [walletAddress, setWalletAddress] = useState("");
+  // create a state varaible for supply
   const [totalSupply, setTotalSupply] = useState(0);
   const [inProgress, setInProgress] = useState(false);
   const [completed, setCompleted] = useState(false);
@@ -75,38 +75,22 @@ function App() {
     };
     // add ether to in sendOption for MOralis
 
-    console.log("Whoo hoo let's gooo");
+    console.log("yooooo");
     const message = await Moralis.executeFunction(sendOptions);
     setTotalSupply(message.toNumber());
     // when do we know that transaction is completed
   };
 
-  const requestAccount = async () => {
-    console.log("Requesting account");
-
-    // Check if Metamask extension exists in browser
-    if (window.ethereum) {
-      console.log("Metamask detected");
-
-      try {
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts"
+  const login = async () => {
+    if (!isAuthenticated) {
+      await authenticate({ signingMessage: "Log in using Moralis" })
+        .then(function (user) {
+          console.log("logged in user:", user);
+          console.log(user.get("ethAddress"));
+        })
+        .catch(function (error) {
+          console.log(error);
         });
-        setWalletAddress(accounts[0]);
-      } catch (error) {
-        console.log("Error connecting...");
-      }
-    } else {
-      console.log("Metamask not detected");
-    }
-  };
-
-  const connectWallet = async () => {
-    if (typeof window.ethereum !== "undefined") {
-      await requestAccount();
-
-      //npm install ethers (NOT ethers.js)
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
     }
   };
 
@@ -123,7 +107,7 @@ function App() {
       return <StartMinting mint={mint} logOut={logOut} />;
     } else {
       return (
-        <div onClick={connectWallet} className="wallet">
+        <div onClick={login} className="wallet">
           CONNECT WALLET
         </div>
       );
